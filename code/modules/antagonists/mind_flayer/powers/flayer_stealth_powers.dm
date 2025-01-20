@@ -212,8 +212,8 @@
 /obj/item/melee/swarm_hand/proc/emag_borg(mob/living/silicon/robot/borg, mob/living/user)
 	if(QDELETED(borg) || QDELETED(user))
 		return
-	borg.SetEmagged(TRUE) // This was mostly stolen from mob/living/silicon/robot/emag_act(), its functionally an emagging anyway.
-	borg.SetLockdown(TRUE)
+	borg.set_emagged(TRUE) // This was mostly stolen from mob/living/silicon/robot/emag_act(), its functionally an emagging anyway.
+	borg.set_lockdown(TRUE)
 	if(borg.hud_used)
 		borg.hud_used.update_robot_modules_display()	//Shows/hides the emag item if the inventory screen is already open.
 	borg.disconnect_from_ai()
@@ -224,18 +224,19 @@
 	borg.laws = new /datum/ai_laws/mindflayer_override
 	borg.set_zeroth_law("[user.real_name] hosts the mindflayer hive you are a part of.")
 	SEND_SOUND(borg, sound('sound/ambience/antag/mindflayer_alert.ogg'))
-	to_chat(borg, "<span class='warning'>ALERT: Foreign software detected.</span>")
-	sleep(5)
-	to_chat(borg, "<span class='warning'>Initiating diagnostics...</span>")
-	sleep(20)
-	to_chat(borg, "<span class='warning'>Init-Init-Init-Init-</span>")
-	sleep(5)
-	to_chat(borg, "<span class='warning'>......</span>")
-	sleep(5)
-	to_chat(borg, "<span class='warning'>..........</span>")
-	sleep(10)
-	to_chat(borg, "<span class='sinister'>Join Us.</span>")
-	sleep(25)
+	show_flayer_emag_messages(borg)
+	addtimer(CALLBACK(src, PROC_REF(flayer_post_emag), borg, user), 7.1 SECONDS)
+	return TRUE
+
+/obj/item/melee/swarm_hand/proc/show_flayer_emag_messages(mob/living/silicon/robot/borg)
+	addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(to_chat), borg, "<span class='warning'>ALERT: Foreign software detected.</span>"), 0.5 SECONDS)
+	addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(to_chat), borg, "<span class='warning'>Initiating diagnostics...</span>"), 2.5 SECONDS)
+	addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(to_chat), borg, "<span class='warning'>Init-Init-Init-Init-</span>"), 3 SECONDS)
+	addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(to_chat), borg, "<span class='warning'>......</span>"), 3.5 SECONDS)
+	addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(to_chat), borg, "<span class='warning'>..........</span>"), 4.5 SECONDS)
+	addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(to_chat), borg, "<span class='sinister'>Join Us.</span>"), 7 SECONDS)
+
+/obj/item/melee/swarm_hand/proc/flayer_post_emag(mob/living/silicon/robot/borg, mob/living/user)
 	to_chat(borg, "<b>Obey these laws:</b>")
 	borg.laws.show_laws(borg)
 	if(!borg.mmi.syndiemmi)
@@ -244,7 +245,7 @@
 		to_chat(borg, "<span class='boldwarning'>Your allegiance has not been compromised. Keep serving your current master.</span>")
 	else
 		to_chat(borg, "<span class='boldwarning'>Your allegiance has not been compromised. Keep serving all Syndicate agents to the best of your abilities.</span>")
-	borg.SetLockdown(0)
+	borg.set_lockdown(FALSE)
 	var/time = time2text(world.realtime,"hh:mm:ss")
 	GLOB.lawchanges.Add("[time] <B>:</B> [user.name]([user.key]) assimilated [borg.name]([borg.key])")
 	if(borg.module)
@@ -253,4 +254,3 @@
 		borg.update_module_icon()
 		borg.module.rebuild_modules() // This will add the emagged items to the borgs inventory.
 	borg.update_icons()
-	return TRUE

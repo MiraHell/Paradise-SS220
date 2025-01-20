@@ -40,7 +40,7 @@
 				R.camera.toggle_cam(usr, 0) // Will kick anyone who is watching the Cyborg's camera.
 
 		if(WIRE_BORG_LOCKED)
-			R.SetLockdown(!mend)
+			R.set_lockdown(!mend)
 	..()
 
 
@@ -58,7 +58,7 @@
 				to_chat(R, "Your camera lense focuses loudly.")
 
 		if(WIRE_BORG_LOCKED)
-			R.SetLockdown(!R.lockcharge) // Toggle
+			R.set_lockdown(!R.lockcharge) // Toggle
 	..()
 
 /datum/wires/robot/interactable(mob/user)

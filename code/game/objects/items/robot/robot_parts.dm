@@ -309,7 +309,7 @@
 			O.robot_suit = src
 
 			if(!locomotion)
-				O.SetLockdown(TRUE)
+				O.set_lockdown(TRUE)
 				to_chat(O, "<span class='danger'>Error: Servo motors unresponsive. Lockdown enabled.</span>")
 
 		else

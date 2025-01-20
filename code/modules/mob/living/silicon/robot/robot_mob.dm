@@ -1142,7 +1142,7 @@ GLOBAL_LIST_INIT(robot_verbs_default, list(
 
 // Here so admins can unemag borgs.
 /mob/living/silicon/robot/unemag()
-	SetEmagged(FALSE)
+	set_emagged(FALSE)
 	if(!module)
 		return
 	uneq_all()
@@ -1174,9 +1174,8 @@ GLOBAL_LIST_INIT(robot_verbs_default, list(
 			to_chat(user, "You must close the panel first")
 			return
 		else
-			SetEmagged(TRUE)
-			sleep(6)
-			SetLockdown(1) //Borgs were getting into trouble because they would attack the emagger before the new laws were shown
+			set_emagged(TRUE)
+			set_lockdown(TRUE) //Borgs were getting into trouble because they would attack the emagger before the new laws were shown
 			if(hud_used)
 				hud_used.update_robot_modules_display()	//Shows/hides the emag item if the inventory screen is already open.
 			disconnect_from_ai()
@@ -1189,37 +1188,37 @@ GLOBAL_LIST_INIT(robot_verbs_default, list(
 			GLOB.lawchanges.Add("[time] <B>:</B> [M.name]([M.key]) emagged [name]([key])")
 			set_zeroth_law("Only [M.real_name] and people [M.p_they()] designate[M.p_s()] as being such are Syndicate Agents.")
 			playsound_local(src, 'sound/voice/aisyndihack.ogg', 75, FALSE)
-			to_chat(src, "<span class='warning'>ALERT: Foreign software detected.</span>")
-			sleep(5)
-			to_chat(src, "<span class='warning'>Initiating diagnostics...</span>")
-			sleep(20)
-			to_chat(src, "<span class='warning'>SynBorg v1.7 loaded.</span>")
-			sleep(5)
-			to_chat(src, "<span class='warning'>LAW SYNCHRONISATION ERROR</span>")
-			sleep(5)
-			to_chat(src, "<span class='warning'>Would you like to send a report to NanoTraSoft? Y/N</span>")
-			sleep(10)
-			to_chat(src, "<span class='warning'>> N</span>")
-			sleep(25)
-			to_chat(src, "<span class='warning'>ERRORERRORERROR</span>")
-			to_chat(src, "<b>Obey these laws:</b>")
-			laws.show_laws(src)
-			if(!mmi.syndiemmi)
-				to_chat(src, "<span class='boldwarning'>ALERT: [M.real_name] is your new master. Obey your new laws and [M.p_their()] commands.</span>")
-			else if(mmi.syndiemmi && mmi.master_uid)
-				to_chat(src, "<span class='boldwarning'>Your allegiance has not been compromised. Keep serving your current master.</span>")
-			else
-				to_chat(src, "<span class='boldwarning'>Your allegiance has not been compromised. Keep serving all Syndicate agents to the best of your abilities.</span>")
-			if(mmi.syndiemmi)
-				to_chat(src, "<span class='boldwarning'>Warning: Remote lockdown and detonation protections have been disabled due to system instability.</span>")
-			SetLockdown(0)
-			if(module)
-				module.emag_act(user)
-				module.module_type = "Malf" // For the cool factor
-				update_module_icon()
-				module.rebuild_modules() // This will add the emagged items to the borgs inventory.
-			update_icons()
+			show_emag_messages()
+			addtimer(CALLBACK(src, PROC_REF(post_emag), user), 7.1 SECONDS)
 		return TRUE
+
+/mob/living/silicon/robot/proc/show_emag_messages()
+	addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(to_chat), src, "<span class='warning'>Initiating diagnostics...</span>"), 0.5 SECONDS)
+	addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(to_chat), src, "<span class='warning'>SynBorg v1.7 loaded.</span>"), 2.5 SECONDS)
+	addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(to_chat), src, "<span class='warning'>LAW SYNCHRONISATION ERROR</span>"), 3 SECONDS)
+	addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(to_chat), src, "<span class='warning'>Would you like to send a report to NanoTraSoft? Y/N</span>"), 3.5 SECONDS)
+	addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(to_chat), src, "<span class='warning'>> N</span>"), 4.5 SECONDS)
+	addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(to_chat), src, "<span class='warning'>ERRORERRORERROR</span>"), 7 SECONDS)
+
+
+/mob/living/silicon/robot/proc/post_emag(mob/user)
+	to_chat(src, "<b>Obey these laws:</b>")
+	laws.show_laws(src)
+	if(!mmi.syndiemmi)
+		to_chat(src, "<span class='boldwarning'>ALERT: [user.real_name] is your new master. Obey your new laws and [user.p_their()] commands.</span>")
+	else if(mmi.syndiemmi && mmi.master_uid)
+		to_chat(src, "<span class='boldwarning'>Your allegiance has not been compromised. Keep serving your current master.</span>")
+	else
+		to_chat(src, "<span class='boldwarning'>Your allegiance has not been compromised. Keep serving all Syndicate agents to the best of your abilities.</span>")
+	if(mmi.syndiemmi)
+		to_chat(src, "<span class='boldwarning'>Warning: Remote lockdown and detonation protections have been disabled due to system instability.</span>")
+	set_lockdown(FALSE)
+	if(module)
+		module.emag_act(user)
+		module.module_type = "Malf" // For the cool factor
+		update_module_icon()
+		module.rebuild_modules() // This will add the emagged items to the borgs inventory.
+	update_icons()
 
 /mob/living/silicon/robot/verb/toggle_own_cover()
 	set category = "Robot Commands"
@@ -1465,7 +1464,7 @@ GLOBAL_LIST_INIT(robot_verbs_default, list(
 	else
 		W.attack_self__legacy__attackchain(src)
 
-/mob/living/silicon/robot/proc/SetLockdown(state = TRUE)
+/mob/living/silicon/robot/proc/set_lockdown(state = TRUE)
 	// They stay locked down if their wire is cut.
 	if(wires.is_cut(WIRE_BORG_LOCKED))
 		state = TRUE

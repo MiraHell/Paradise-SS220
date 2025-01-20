@@ -208,7 +208,7 @@
 				to_chat(R, "<span class='danger'>Emergency lockdown received.</span>")
 				if(R.connected_ai)
 					to_chat(R.connected_ai, "<br><br><span class='alert'>ALERT - Cyborg lockdown detected: [R.name]</span><br>")
-				R.SetLockdown(!R.lockcharge)
+				R.set_lockdown(!R.lockcharge)
 			. = TRUE
 		if("killbot") // destroys one specific cyborg
 			if(!COOLDOWN_FINISHED(src, detonate_cooldown))
@@ -240,7 +240,7 @@
 				return
 			message_admins("<span class='notice'>[ADMIN_LOOKUPFLW(usr)] [!R.lockcharge ? "locked down" : "released"] [ADMIN_LOOKUPFLW(R)]!</span>")
 			log_game("[key_name(usr)] [!R.lockcharge ? "locked down" : "released"] [key_name(R)]!")
-			R.SetLockdown(!R.lockcharge)
+			R.set_lockdown(!R.lockcharge)
 			to_chat(R, "[!R.lockcharge ? "<span class='notice'>Your lockdown has been lifted!" : "<span class='alert'>You have been locked down!"]</span>")
 			if(R.connected_ai)
 				to_chat(R.connected_ai, "[!R.lockcharge ? "<span class='notice'>NOTICE - Cyborg lockdown lifted</span>" : "<span class='alert'>ALERT - Cyborg lockdown detected</span>"]: <a href='byond://?src=[R.connected_ai.UID()];track=[html_encode(R.name)]'>[R.name]</a></span><br>")

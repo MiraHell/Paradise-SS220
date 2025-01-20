@@ -58,7 +58,7 @@
 	else
 		radio.on = TRUE
 
-/mob/living/silicon/robot/proc/SetEmagged(new_state)
+/mob/living/silicon/robot/proc/set_emagged(new_state)
 	emagged = new_state
 	update_icons()
 	if(emagged)
